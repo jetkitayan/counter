@@ -470,51 +470,39 @@
             <div class="counter-name-wrap">
               <div class="counter-name">${escapeHtml(name)}</div>
               <div class="counter-dates">
-開始: ${escapeHtml(formatDateTime(item.created_at))}
-更新: <span class="updated-at">${escapeHtml(formatDateTime(item.updated_at))}</span>
+    開始: ${escapeHtml(formatDateTime(item.created_at))}
+    更新: <span class="updated-at">${escapeHtml(formatDateTime(item.updated_at))}</span>
               </div>
             </div>
-
+    
             <div class="row">
               <button class="rename-btn" data-id="${item.id}" data-name="${escapeHtml(item.name || "")}">名称変更</button>
               <button class="clear-btn" data-id="${item.id}">クリア</button>
               <button class="delete-btn danger" data-id="${item.id}">削除</button>
             </div>
           </div>
-
+    
           <div class="digits">
             <div class="digit-card">
               <div class="digit-label">1桁目</div>
               <div class="digit-value" data-digit="1">${escapeHtml(item.d1 ?? 0)}</div>
-              <div class="digit-value" data-digit="2">${escapeHtml(item.d2 ?? 0)}</div>
-              <div class="digit-value" data-digit="3">${escapeHtml(item.d3 ?? 0)}</div>
-              <div class="digit-value" data-digit="4">${escapeHtml(item.d4 ?? 0)}</div>
               <button class="digit-btn increment-btn" data-id="${item.id}" data-digit="1">+1</button>
             </div>
-
+    
             <div class="digit-card">
               <div class="digit-label">2桁目</div>
-              <div class="digit-value" data-digit="1">${escapeHtml(item.d1 ?? 0)}</div>
               <div class="digit-value" data-digit="2">${escapeHtml(item.d2 ?? 0)}</div>
-              <div class="digit-value" data-digit="3">${escapeHtml(item.d3 ?? 0)}</div>
-              <div class="digit-value" data-digit="4">${escapeHtml(item.d4 ?? 0)}</div>
               <button class="digit-btn increment-btn" data-id="${item.id}" data-digit="2">+1</button>
             </div>
-
+    
             <div class="digit-card">
               <div class="digit-label">3桁目</div>
-              <div class="digit-value" data-digit="1">${escapeHtml(item.d1 ?? 0)}</div>
-              <div class="digit-value" data-digit="2">${escapeHtml(item.d2 ?? 0)}</div>
               <div class="digit-value" data-digit="3">${escapeHtml(item.d3 ?? 0)}</div>
-              <div class="digit-value" data-digit="4">${escapeHtml(item.d4 ?? 0)}</div>
               <button class="digit-btn increment-btn" data-id="${item.id}" data-digit="3">+1</button>
             </div>
-
+    
             <div class="digit-card">
               <div class="digit-label">4桁目</div>
-              <div class="digit-value" data-digit="1">${escapeHtml(item.d1 ?? 0)}</div>
-              <div class="digit-value" data-digit="2">${escapeHtml(item.d2 ?? 0)}</div>
-              <div class="digit-value" data-digit="3">${escapeHtml(item.d3 ?? 0)}</div>
               <div class="digit-value" data-digit="4">${escapeHtml(item.d4 ?? 0)}</div>
               <button class="digit-btn increment-btn" data-id="${item.id}" data-digit="4">+1</button>
             </div>
@@ -522,7 +510,7 @@
         </div>
       `;
     }
-
+    
     function bindListEvents() {
       document.querySelectorAll(".increment-btn").forEach(btn => {
         btn.addEventListener("click", () => {
