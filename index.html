@@ -379,17 +379,47 @@
     }
 
     async function incrementDigit(id, digit) {
+      const card = document.querySelector(`.counter-item[data-id="${id}"]`);
+      if (!card) return;
+    
+      const valueEl = card.querySelector(`.digit-value[data-digit="${digit}"]`);
+      const updatedAtEl = card.querySelector(".updated-at");
+    
+      if (!valueEl) return;
+    
+      const oldValue = Number(valueEl.textContent || "0");
+      const newValue = oldValue >= 9 ? 0 : oldValue + 1;
+    
+      // 先に画面だけ更新
+      valueEl.textContent = String(newValue);
+      if (updatedAtEl) {
+        updatedAtEl.textContent = new Date().toLocaleString("ja-JP");
+      }
+    
       try {
-        await apiFetch(`/api/counter4/${encodeURIComponent(id)}/increment`, {
+        const data = await apiFetch(`/api/counter4/${encodeURIComponent(id)}/increment`, {
           method: "PATCH",
           body: JSON.stringify({ digit }),
         });
-        await loadCounters();
+    
+        // サーバの値で最終反映
+        const item = data.item;
+        if (item) {
+          card.querySelector(`.digit-value[data-digit="1"]`).textContent = item.d1;
+          card.querySelector(`.digit-value[data-digit="2"]`).textContent = item.d2;
+          card.querySelector(`.digit-value[data-digit="3"]`).textContent = item.d3;
+          card.querySelector(`.digit-value[data-digit="4"]`).textContent = item.d4;
+          if (updatedAtEl) {
+            updatedAtEl.textContent = formatDateTime(item.updated_at);
+          }
+        }
       } catch (err) {
+        // 失敗したら戻す
+        valueEl.textContent = String(oldValue);
         alert("カウントアップ失敗: " + err.message);
       }
     }
-
+    
     async function clearCounter(id) {
       if (!confirm("このカウンターの4桁を 0000 にしますか？")) return;
 
@@ -435,7 +465,7 @@
     function renderCounterItem(item) {
       const name = item.name || "名称なし";
       return `
-        <div class="counter-item">
+        <div class="counter-item" data-id="${item.id}">
           <div class="counter-head">
             <div class="counter-name-wrap">
               <div class="counter-name">${escapeHtml(name)}</div>
@@ -455,25 +485,37 @@
           <div class="digits">
             <div class="digit-card">
               <div class="digit-label">1桁目</div>
-              <div class="digit-value">${escapeHtml(item.d1 ?? 0)}</div>
+              <div class="digit-value" data-digit="1">${escapeHtml(item.d1 ?? 0)}</div>
+              <div class="digit-value" data-digit="2">${escapeHtml(item.d2 ?? 0)}</div>
+              <div class="digit-value" data-digit="3">${escapeHtml(item.d3 ?? 0)}</div>
+              <div class="digit-value" data-digit="4">${escapeHtml(item.d4 ?? 0)}</div>
               <button class="digit-btn increment-btn" data-id="${item.id}" data-digit="1">+1</button>
             </div>
 
             <div class="digit-card">
               <div class="digit-label">2桁目</div>
-              <div class="digit-value">${escapeHtml(item.d2 ?? 0)}</div>
+              <div class="digit-value" data-digit="1">${escapeHtml(item.d1 ?? 0)}</div>
+              <div class="digit-value" data-digit="2">${escapeHtml(item.d2 ?? 0)}</div>
+              <div class="digit-value" data-digit="3">${escapeHtml(item.d3 ?? 0)}</div>
+              <div class="digit-value" data-digit="4">${escapeHtml(item.d4 ?? 0)}</div>
               <button class="digit-btn increment-btn" data-id="${item.id}" data-digit="2">+1</button>
             </div>
 
             <div class="digit-card">
               <div class="digit-label">3桁目</div>
-              <div class="digit-value">${escapeHtml(item.d3 ?? 0)}</div>
+              <div class="digit-value" data-digit="1">${escapeHtml(item.d1 ?? 0)}</div>
+              <div class="digit-value" data-digit="2">${escapeHtml(item.d2 ?? 0)}</div>
+              <div class="digit-value" data-digit="3">${escapeHtml(item.d3 ?? 0)}</div>
+              <div class="digit-value" data-digit="4">${escapeHtml(item.d4 ?? 0)}</div>
               <button class="digit-btn increment-btn" data-id="${item.id}" data-digit="3">+1</button>
             </div>
 
             <div class="digit-card">
               <div class="digit-label">4桁目</div>
-              <div class="digit-value">${escapeHtml(item.d4 ?? 0)}</div>
+              <div class="digit-value" data-digit="1">${escapeHtml(item.d1 ?? 0)}</div>
+              <div class="digit-value" data-digit="2">${escapeHtml(item.d2 ?? 0)}</div>
+              <div class="digit-value" data-digit="3">${escapeHtml(item.d3 ?? 0)}</div>
+              <div class="digit-value" data-digit="4">${escapeHtml(item.d4 ?? 0)}</div>
               <button class="digit-btn increment-btn" data-id="${item.id}" data-digit="4">+1</button>
             </div>
           </div>
