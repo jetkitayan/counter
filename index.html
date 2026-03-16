@@ -382,43 +382,80 @@
       const card = document.querySelector(`.counter-item[data-id="${id}"]`);
       if (!card) return;
     
-      const valueEl = card.querySelector(`.digit-value[data-digit="${digit}"]`);
       const updatedAtEl = card.querySelector(".updated-at");
     
-      if (!valueEl) return;
+      // 4桁の現在値取得
+      let d1 = Number(card.querySelector(`[data-digit="1"]`).textContent);
+      let d2 = Number(card.querySelector(`[data-digit="2"]`).textContent);
+      let d3 = Number(card.querySelector(`[data-digit="3"]`).textContent);
+      let d4 = Number(card.querySelector(`[data-digit="4"]`).textContent);
     
-      const oldValue = Number(valueEl.textContent || "0");
-      const oldUpdatedAt = updatedAtEl ? updatedAtEl.textContent : "";
-      const newValue = oldValue >= 9 ? 0 : oldValue + 1;
+      const oldValues = { d1, d2, d3, d4 };
     
-      // 先に画面だけ更新
-      valueEl.textContent = String(newValue);
+      function carry(value) {
+        return value >= 10 ? 1 : 0;
+      }
+    
+      // 桁ごと処理
+      if (digit === 4) {
+        d4++;
+        if (d4 >= 10) {
+          d4 = 0;
+          d3++;
+        }
+      }
+    
+      if (digit === 3) {
+        d3++;
+      }
+    
+      if (digit === 2) {
+        d2++;
+      }
+    
+      if (digit === 1) {
+        d1++;
+      }
+    
+      // 上位桁処理
+      if (d3 >= 10) {
+        d3 = 0;
+        d2++;
+      }
+    
+      if (d2 >= 10) {
+        d2 = 0;
+        d1++;
+      }
+    
+      if (d1 >= 10) {
+        d1 = 0;
+      }
+    
+      // 画面先更新
+      card.querySelector(`[data-digit="1"]`).textContent = d1;
+      card.querySelector(`[data-digit="2"]`).textContent = d2;
+      card.querySelector(`[data-digit="3"]`).textContent = d3;
+      card.querySelector(`[data-digit="4"]`).textContent = d4;
+    
       if (updatedAtEl) {
         updatedAtEl.textContent = new Date().toLocaleString("ja-JP");
       }
     
       try {
-        const data = await apiFetch(`/api/counter4/${encodeURIComponent(id)}/increment`, {
+        await apiFetch(`/api/counter4/${encodeURIComponent(id)}/increment`, {
           method: "PATCH",
           body: JSON.stringify({ digit }),
         });
     
-        const item = data.item;
-        if (item) {
-          card.querySelector(`.digit-value[data-digit="1"]`).textContent = item.d1;
-          card.querySelector(`.digit-value[data-digit="2"]`).textContent = item.d2;
-          card.querySelector(`.digit-value[data-digit="3"]`).textContent = item.d3;
-          card.querySelector(`.digit-value[data-digit="4"]`).textContent = item.d4;
-    
-          if (updatedAtEl) {
-            updatedAtEl.textContent = formatDateTime(item.updated_at);
-          }
-        }
       } catch (err) {
-        valueEl.textContent = String(oldValue);
-        if (updatedAtEl) {
-          updatedAtEl.textContent = oldUpdatedAt;
-        }
+    
+        // 失敗したら戻す
+        card.querySelector(`[data-digit="1"]`).textContent = oldValues.d1;
+        card.querySelector(`[data-digit="2"]`).textContent = oldValues.d2;
+        card.querySelector(`[data-digit="3"]`).textContent = oldValues.d3;
+        card.querySelector(`[data-digit="4"]`).textContent = oldValues.d4;
+    
         alert("カウントアップ失敗: " + err.message);
       }
     }
