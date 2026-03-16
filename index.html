@@ -388,6 +388,7 @@
       if (!valueEl) return;
     
       const oldValue = Number(valueEl.textContent || "0");
+      const oldUpdatedAt = updatedAtEl ? updatedAtEl.textContent : "";
       const newValue = oldValue >= 9 ? 0 : oldValue + 1;
     
       // 先に画面だけ更新
@@ -402,20 +403,22 @@
           body: JSON.stringify({ digit }),
         });
     
-        // サーバの値で最終反映
         const item = data.item;
         if (item) {
           card.querySelector(`.digit-value[data-digit="1"]`).textContent = item.d1;
           card.querySelector(`.digit-value[data-digit="2"]`).textContent = item.d2;
           card.querySelector(`.digit-value[data-digit="3"]`).textContent = item.d3;
           card.querySelector(`.digit-value[data-digit="4"]`).textContent = item.d4;
+    
           if (updatedAtEl) {
             updatedAtEl.textContent = formatDateTime(item.updated_at);
           }
         }
       } catch (err) {
-        // 失敗したら戻す
         valueEl.textContent = String(oldValue);
+        if (updatedAtEl) {
+          updatedAtEl.textContent = oldUpdatedAt;
+        }
         alert("カウントアップ失敗: " + err.message);
       }
     }
