@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>4桁カウンター</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #f7f7f8;
+      color: #222;
+      line-height: 1.5;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: #fff;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 12px 16px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    main {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 16px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      border: 1px solid #cfd5dd;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 16px;
+      background: #fff;
+    }
+
+    button {
+      border: 1px solid #cfd5dd;
+      background: #fff;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #f3f4f6;
+    }
+
+    button.danger {
+      border-color: #e5b4b4;
+    }
+
+    button.primary {
+      font-weight: 700;
+    }
+
+    .muted {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .error {
+      color: #b00020;
+      font-weight: 600;
+    }
+
+    .success {
+      color: #0a7a35;
+      font-weight: 600;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    #authArea {
+      background: #fff8e1;
+      border: 1px solid #f0d98c;
+      border-radius: 12px;
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .counter-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .counter-item {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      background: #fafafa;
+      padding: 14px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .counter-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .counter-name-wrap {
+      flex: 1 1 280px;
+      min-width: 220px;
+    }
+
+    .counter-name {
+      font-size: 18px;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    .counter-dates {
+      font-size: 13px;
+      color: #666;
+      white-space: pre-wrap;
+    }
+
+    .digits {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .digit-card {
+      border: 1px solid #d9dee6;
+      border-radius: 12px;
+      background: #fff;
+      padding: 12px;
+      text-align: center;
+      display: grid;
+      gap: 10px;
+    }
+
+    .digit-label {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .digit-value {
+      font-size: 40px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .digit-btn {
+      width: 100%;
+      font-size: 18px;
+      font-weight: 700;
+      padding: 12px 0;
+    }
+
+    .empty-box {
+      border: 1px dashed #cfd5dd;
+      border-radius: 12px;
+      padding: 18px;
+      background: #fafafa;
+      color: #666;
+    }
+
+    @media (max-width: 720px) {
+      .digits {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .digit-value {
+        font-size: 34px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>4桁カウンター</h1>
+  </header>
+
+  <main>
+    <div id="authArea" class="hidden">
+      <div class="muted">最初の1回だけ Basic 認証情報を入力してください。</div>
+      <input id="basicUserInput" type="text" placeholder="Basic User" />
+      <input id="basicPassInput" type="password" placeholder="Basic Pass" />
+      <button id="saveAuthBtn">保存</button>
+      <div id="authMsg" class="muted"></div>
+    </div>
+
+    <section class="card">
+      <h2>新規カウンター作成</h2>
+      <div class="grid">
+        <div>
+          <label for="newName">名称</label>
+          <input id="newName" type="text" placeholder="例: 腹筋回数 / バスケ練習 / 英語音読 など" />
+        </div>
+
+        <div class="row">
+          <button id="createBtn" class="primary">新規作成</button>
+          <button id="reloadBtn">再読込</button>
+        </div>
+
+        <div id="createMsg" class="muted"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>カウンター一覧</h2>
+      <div class="muted" id="summaryMsg">読み込み前</div>
+      <div id="counterList" class="counter-list" style="margin-top:12px;"></div>
+    </section>
+  </main>
+
+  <script>
+    const API_BASE = "https://memo-save-api.jetkitayan.workers.dev";
+    const BASIC_USER_KEY = "counter4_basic_user";
+    const BASIC_PASS_KEY = "counter4_basic_pass";
+
+    let BASIC_USER = localStorage.getItem(BASIC_USER_KEY) || "";
+    let BASIC_PASS = localStorage.getItem(BASIC_PASS_KEY) || "";
+
+    const authArea = document.getElementById("authArea");
+    const userInput = document.getElementById("basicUserInput");
+    const passInput = document.getElementById("basicPassInput");
+    const saveAuthBtn = document.getElementById("saveAuthBtn");
+    const authMsg = document.getElementById("authMsg");
+
+    const el = {
+      newName: document.getElementById("newName"),
+      createBtn: document.getElementById("createBtn"),
+      reloadBtn: document.getElementById("reloadBtn"),
+      createMsg: document.getElementById("createMsg"),
+      summaryMsg: document.getElementById("summaryMsg"),
+      counterList: document.getElementById("counterList"),
+    };
+
+    function escapeHtml(str) {
+      return String(str ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function formatDateTime(s) {
+      if (!s) return "-";
+      const d = new Date(s);
+      if (isNaN(d.getTime())) return String(s);
+      return d.toLocaleString("ja-JP");
+    }
+
+    function getConfig() {
+      return {
+        apiBase: API_BASE,
+        basicUser: BASIC_USER,
+        basicPass: BASIC_PASS,
+      };
+    }
+
+    function authHeader() {
+      const { basicUser, basicPass } = getConfig();
+      return "Basic " + btoa(`${basicUser}:${basicPass}`);
+    }
+
+    async function apiFetch(path, options = {}) {
+      const { apiBase, basicUser, basicPass } = getConfig();
+
+      if (!apiBase) {
+        throw new Error("API Base URL が未設定です");
+      }
+      if (!basicUser || !basicPass) {
+        throw new Error("Basic認証情報を保存してください");
+      }
+
+      const headers = {
+        "Content-Type": "application/json",
+        "Authorization": authHeader(),
+        ...(options.headers || {}),
+      };
+
+      const res = await fetch(apiBase + path, {
+        ...options,
+        headers,
+      });
+
+      let data = null;
+      const ct = res.headers.get("content-type") || "";
+      if (ct.includes("application/json")) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        data = { raw: text };
+      }
+
+      if (!res.ok) {
+        const msg = data?.error || data?.detail || `HTTP ${res.status}`;
+        throw new Error(msg);
+      }
+
+      if (data && data.ok === false && data.error) {
+        throw new Error(data.error);
+      }
+
+      return data;
+    }
+
+    async function createCounter() {
+      el.createMsg.textContent = "";
+      el.createMsg.className = "muted";
+
+      try {
+        const name = el.newName.value.trim();
+
+        const data = await apiFetch("/api/counter4", {
+          method: "POST",
+          body: JSON.stringify({ name }),
+        });
+
+        el.newName.value = "";
+        el.createMsg.textContent = `作成しました。ID: ${data.item?.id ?? "-"}`;
+        el.createMsg.className = "success";
+
+        await loadCounters();
+      } catch (err) {
+        el.createMsg.textContent = "作成失敗: " + err.message;
+        el.createMsg.className = "error";
+      }
+    }
+
+    async function incrementDigit(id, digit) {
+      try {
+        await apiFetch(`/api/counter4/${encodeURIComponent(id)}/increment`, {
+          method: "PATCH",
+          body: JSON.stringify({ digit }),
+        });
+        await loadCounters();
+      } catch (err) {
+        alert("カウントアップ失敗: " + err.message);
+      }
+    }
+
+    async function clearCounter(id) {
+      if (!confirm("このカウンターの4桁を 0000 にしますか？")) return;
+
+      try {
+        await apiFetch(`/api/counter4/${encodeURIComponent(id)}/clear`, {
+          method: "PATCH",
+          body: JSON.stringify({}),
+        });
+        await loadCounters();
+      } catch (err) {
+        alert("クリア失敗: " + err.message);
+      }
+    }
+
+    async function renameCounter(id, currentName) {
+      const name = prompt("名称を入力してください", currentName ?? "");
+      if (name === null) return;
+
+      try {
+        await apiFetch(`/api/counter4/${encodeURIComponent(id)}`, {
+          method: "PATCH",
+          body: JSON.stringify({ name }),
+        });
+        await loadCounters();
+      } catch (err) {
+        alert("名称更新失敗: " + err.message);
+      }
+    }
+
+    async function deleteCounter(id) {
+      if (!confirm("このカウンターを削除しますか？")) return;
+
+      try {
+        await apiFetch(`/api/counter4/${encodeURIComponent(id)}`, {
+          method: "DELETE",
+        });
+        await loadCounters();
+      } catch (err) {
+        alert("削除失敗: " + err.message);
+      }
+    }
+
+    function renderCounterItem(item) {
+      const name = item.name || "名称なし";
+      return `
+        <div class="counter-item">
+          <div class="counter-head">
+            <div class="counter-name-wrap">
+              <div class="counter-name">${escapeHtml(name)}</div>
+              <div class="counter-dates">
+開始: ${escapeHtml(formatDateTime(item.created_at))}
+更新: ${escapeHtml(formatDateTime(item.updated_at))}
+              </div>
+            </div>
+
+            <div class="row">
+              <button class="rename-btn" data-id="${item.id}" data-name="${escapeHtml(item.name || "")}">名称変更</button>
+              <button class="clear-btn" data-id="${item.id}">クリア</button>
+              <button class="delete-btn danger" data-id="${item.id}">削除</button>
+            </div>
+          </div>
+
+          <div class="digits">
+            <div class="digit-card">
+              <div class="digit-label">1桁目</div>
+              <div class="digit-value">${escapeHtml(item.d1 ?? 0)}</div>
+              <button class="digit-btn increment-btn" data-id="${item.id}" data-digit="1">+1</button>
+            </div>
+
+            <div class="digit-card">
+              <div class="digit-label">2桁目</div>
+              <div class="digit-value">${escapeHtml(item.d2 ?? 0)}</div>
+              <button class="digit-btn increment-btn" data-id="${item.id}" data-digit="2">+1</button>
+            </div>
+
+            <div class="digit-card">
+              <div class="digit-label">3桁目</div>
+              <div class="digit-value">${escapeHtml(item.d3 ?? 0)}</div>
+              <button class="digit-btn increment-btn" data-id="${item.id}" data-digit="3">+1</button>
+            </div>
+
+            <div class="digit-card">
+              <div class="digit-label">4桁目</div>
+              <div class="digit-value">${escapeHtml(item.d4 ?? 0)}</div>
+              <button class="digit-btn increment-btn" data-id="${item.id}" data-digit="4">+1</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function bindListEvents() {
+      document.querySelectorAll(".increment-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          incrementDigit(btn.dataset.id, Number(btn.dataset.digit));
+        });
+      });
+
+      document.querySelectorAll(".clear-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          clearCounter(btn.dataset.id);
+        });
+      });
+
+      document.querySelectorAll(".delete-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          deleteCounter(btn.dataset.id);
+        });
+      });
+
+      document.querySelectorAll(".rename-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          renameCounter(btn.dataset.id, btn.dataset.name || "");
+        });
+      });
+    }
+
+    async function loadCounters() {
+      el.counterList.innerHTML = `<div class="empty-box">読み込み中...</div>`;
+      el.summaryMsg.textContent = "読み込み中...";
+
+      try {
+        const data = await apiFetch("/api/counter4");
+        const items = Array.isArray(data.items) ? data.items : [];
+
+        el.summaryMsg.textContent = `${items.length} / 10 件`;
+
+        if (items.length === 0) {
+          el.counterList.innerHTML = `<div class="empty-box">まだカウンターがありません。</div>`;
+          return;
+        }
+
+        el.counterList.innerHTML = items.map(renderCounterItem).join("");
+        bindListEvents();
+      } catch (err) {
+        el.summaryMsg.textContent = "取得失敗";
+        el.counterList.innerHTML = `<div class="empty-box error">一覧取得失敗: ${escapeHtml(err.message)}</div>`;
+      }
+    }
+
+    function bindEvents() {
+      el.createBtn?.addEventListener("click", createCounter);
+      el.reloadBtn?.addEventListener("click", loadCounters);
+
+      saveAuthBtn?.addEventListener("click", async () => {
+        const user = userInput.value.trim();
+        const pass = passInput.value.trim();
+
+        if (!user || !pass) {
+          authMsg.textContent = "ユーザー名とパスワードを入力してください。";
+          authMsg.className = "error";
+          return;
+        }
+
+        BASIC_USER = user;
+        BASIC_PASS = pass;
+        localStorage.setItem(BASIC_USER_KEY, BASIC_USER);
+        localStorage.setItem(BASIC_PASS_KEY, BASIC_PASS);
+
+        authArea.classList.add("hidden");
+        authMsg.textContent = "";
+        await loadCounters();
+      });
+    }
+
+    async function init() {
+      bindEvents();
+
+      if (!BASIC_USER || !BASIC_PASS) {
+        authArea.classList.remove("hidden");
+        return;
+      }
+
+      authArea.classList.add("hidden");
+      await loadCounters();
+    }
+
+    init();
+  </script>
+</body>
+</html>
